@@ -57,7 +57,7 @@ app.get('/tasks/:id', (req, res) => {
 
 //POST /tasks: Cria uma nova tarefa na lista.
 app.post('/tasks', (req, res) => {
-  let idExist = Tasks.find((t) => t.id === req.body.id);
+  let idVerification = Tasks.find((t) => t.id === req.body.id);
   if (!req.body.title) {
     res.status(404).send('INFORME UM TITULO PARA A TAREFA!!!');
     return
@@ -72,4 +72,18 @@ app.post('/tasks', (req, res) => {
   res.send(`Tarefa numero ${newTask.id}:'${newTask.title}' criada`);
   
 });
-//PUT /tasks/:id 
+//PUT /tasks/:id : Atualiza uma tarefa
+app.put("/tasks/:id", (req,res) =>{
+  const { id } = req.params;
+  let idVerification = Tasks.find((t) => t.id === id);
+  if(!idVerification){
+    res.status(404).send ("ID de Tarefa inexistente! Informe um ID valido.");
+    return
+  }
+  let taskFound = Tasks.findIndex((t) => t.id === req.body.id);
+  Tasks[taskFound] = req.body;
+  Tasks[taskFound].id = id;
+  res.send(` A tarefa numero ${id} foi atualizada. Tasks: ${Tasks}`);
+  
+
+});
