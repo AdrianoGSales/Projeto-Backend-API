@@ -18,18 +18,24 @@ let Tasks = [
   title: "Estudar para a prova",
   description: "Revisar os slides e livros",
   completed: true
+},
+{
+  id:"003",
+  title: "Ir para academia",
+  description: "Treino de musculos superiores",
+  completed: false
 }]
 
 //GerarID
 let createId = () => {
   let id = '';
   for(i=id.length; i<3; i++) {
-    id += (Math.floor(Math.random()*9)).toString();
+    id += (Math.floor(Math.random()*10)).toString();
   }
   return id;
 }
 
-//VERIFICA ID PARA GERAR UM VALIDO E UNICO
+//Verifica ID para gerar um valido e unico
 let checkId = () => {
   let newId = createId();
   while (Tasks.find((t)=>t.id ===newId)){
@@ -38,15 +44,15 @@ let checkId = () => {
   return newId;
 }
 
-//endpoint para listar as tarefas =)
+//Endpoint para listar as tarefas =)
 app.get('/tasks', (req,res) =>{
   res.send(Tasks)
 })
 
-//GET /tasks: Cria uma nova tarefa na lista.
+//GET /tasks:id Retorna tarefa com Id correspondente
 app.get('/tasks/:id', (req, res) => {
   const taskId = (req.params.id);
-  const task = Tasks.find(t => t.id === taskId);
+  const task = Tasks.find((t) => t.id === taskId);
   if (task) {
     res.send(task);
   }
@@ -55,11 +61,11 @@ app.get('/tasks/:id', (req, res) => {
   }
 });
 
-//POST /tasks: Cria uma nova tarefa na lista.
+//POST /tasks Cria uma nova tarefa na lista
 app.post('/tasks', (req, res) => {
   let idVerification = Tasks.find((t) => t.id === req.body.id);
   if (!req.body.title) {
-    res.status(404).send('INFORME UM TITULO PARA A TAREFA!!!');
+    res.status(404).send('Informe um titulo para a tarefa!!!');
     return
   }
   newTask = {
@@ -72,6 +78,7 @@ app.post('/tasks', (req, res) => {
   res.send(`Tarefa numero ${newTask.id}:'${newTask.title}' criada`);
   
 });
+
 //PUT /tasks/:id : Atualiza uma tarefa
 app.put("/tasks/:id", (req,res) =>{
   const { id } = req.params;
@@ -83,7 +90,18 @@ app.put("/tasks/:id", (req,res) =>{
   let taskFound = Tasks.findIndex((t) => t.id === req.body.id);
   Tasks[taskFound] = req.body;
   Tasks[taskFound].id = id;
-  res.send(` A tarefa numero ${id} foi atualizada. Tasks: ${Tasks}`);
-  
-
+  res.send(` A tarefa numero ${id} foi atualizada. `);
 });
+
+//DELETE /tasks/:id: Remove a tarefa com o ID correspondente.
+app.delete("/tasks/:id", (req, res)=>{
+  const { id } = req.params;
+  let idVerification = Tasks.find((t) => t.id === id);
+  if(!idVerification){
+    res.status(404).send ("ID de Tarefa inexistente! Informe um ID valido.");
+    return
+  }
+  let taskFound = Tasks.findIndex((t) => t.id === req.body.id);
+  Tasks.splice(taskFound,1);
+  res.send(`A tarefa ${id} foi deletada com sucesso.`);
+})
